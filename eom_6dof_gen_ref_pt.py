@@ -88,27 +88,27 @@ def _EoM(state_vector, mp_obj, total_force, total_moment):
 
 	#accelerations = np.linalg.solve(mp_matrix, rhs)
 
-    # custom implicit operation
-    model = csdl.Model()
-    a_mat = model.declare_variable('a_mat')
-    b_mat = model.declare_variable('b_mat')
-    state = model.declare_variable('state')
-    residual = csdl.matmat(a_mat, state) - b_mat
-    model.register_output('residual', residual)
-
-    solve_quadratic = self.create_implicit_operation(model)
-    solve_quadratic.declare_state('state', residual='residual')
-    solve_quadratic.nonlinear_solver = NewtonSolver(
-        solve_subsystems=False,
-        maxiter=100,
-        iprint=False,
-        )
-    solve_quadratic.linear_solver = ScipyKrylov()    
-    
-    a_mat = self.declare_variable('a_mat', val=mp_matrix)
-    b_mat = self.declare_variable('b_mat', val=rhs)
-    accelerations = solve_quadratic(a_mat, b_mat)
-    # end custom implicit op
+        # custom implicit operation
+        model = csdl.Model()
+        a_mat = model.declare_variable('a_mat')
+        b_mat = model.declare_variable('b_mat')
+        state = model.declare_variable('state')
+        residual = csdl.matmat(a_mat, state) - b_mat
+        model.register_output('residual', residual)
+        
+        solve_quadratic = self.create_implicit_operation(model)
+        solve_quadratic.declare_state('state', residual='residual')
+        solve_quadratic.nonlinear_solver = NewtonSolver(
+            solve_subsystems=False,
+            maxiter=100,
+            iprint=False,
+            )
+        solve_quadratic.linear_solver = ScipyKrylov()    
+        
+        a_mat = self.declare_variable('a_mat', val=mp_matrix)
+        b_mat = self.declare_variable('b_mat', val=rhs)
+        accelerations = solve_quadratic(a_mat, b_mat)
+        # end custom implicit op
     
 
 	du_dt = accelerations[0]
